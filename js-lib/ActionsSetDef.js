@@ -44,23 +44,23 @@ export default class ActionsSetDef
         return this;
     }
 
-    callNative(actionsSetName, actionName, actionArgs = {}, callbackFn = null)
-    {
-        abNative.callNative(actionsSetName, actionName, actionArgs, callbackFn);
-    }
+    // callNative(actionsSetName, actionName, actionArgs = {}, callbackFn = null)
+    // {
+    //     abNative.callNative(actionsSetName, actionName, actionArgs, callbackFn);
+    // }
 
-    callNative_Async(actionName, actionArgs = {})
-    {
-        return new Promise((resolve, reject) => {
-            try {
-                this.callNative(actionName, actionArgs, (result) => {
-                    resolve(result);
-                });
-            } catch (e) {
-                reject(e);
-            }
-        });
-    }
+    // callNative_Async(actionName, actionArgs = {})
+    // {
+    //     return new Promise((resolve, reject) => {
+    //         try {
+    //             this.callNative(actionName, actionArgs, (result) => {
+    //                 resolve(result);
+    //             });
+    //         } catch (e) {
+    //             reject(e);
+    //         }
+    //     });
+    // }
 
     getNativeInfo(actionName)
     {
