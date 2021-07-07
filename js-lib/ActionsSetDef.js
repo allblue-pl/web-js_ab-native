@@ -65,7 +65,7 @@ export default class ActionsSetDef
     getNativeInfo(actionName)
     {
         if (!(actionName in this._actions_Native))
-            throw new Error(`Action '${actionName}' does not exist in Actions Set '${this.name}'.`);
+            throw new Error(`Action '${actionName}' does not exist.`);
 
         return this._actions_Native[actionName];
     }
@@ -73,9 +73,13 @@ export default class ActionsSetDef
     getWebInfo(actionName)
     {
         if (!(actionName in this._actions_Web))
-            throw new Error(`Action '${actionName}' does not exist in Actions Set '${this.name}'.`);
+            throw new Error(`Action '${actionName}' does not exist.`);
 
         return this._actions_Web[actionName];
+    }
+
+    hasNative(actionName) {
+        return actionName in this._actions_Native;
     }
 
     // init()

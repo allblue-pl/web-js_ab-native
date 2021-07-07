@@ -49,27 +49,6 @@ class abNative_Class
     //     return new NativeActionsSet(name);
     // }
 
-    callNative(actionsSetName, actionName, args = {}, callbackFn = null)
-    {
-        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
-                js0.Null, js0.Default ]);
-
-        if (this.nativeApp === null)
-            throw new Error('Platform not set.');
-
-        if (!this._initialized)
-            throw new Error(`'abNative' has not been initialized.`);
-
-        let actionInfo = this.getActionSet(actionsSetName).getNativeInfo(actionName);
-        let actionId = ++this._actionId_Last;
-        this._onResultInfos[actionId] = {
-            actionInfo: actionInfo,
-            callbackFn: callbackFn,
-        };
-
-        this.nativeApp.callNative(actionId, actionsSetName, actionInfo, args);
-    }
-
     callNative_Async(actionsSetName, actionName, args = {}, callbackFn = null)
     {
         js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
@@ -77,7 +56,7 @@ class abNative_Class
 
         return new Promise((resolve, reject) => {
             try {
-                this.callNative(actionsSetName, actionName, args, (result) => {
+                this._callNative(actionsSetName, actionName, args, (result) => {
                     resolve(result);
                 });
             } catch (e) {
@@ -175,6 +154,31 @@ class abNative_Class
         this.init(platform);
     }
 
+
+    _callNative(actionsSetName, actionName, args = {}, callbackFn = null)
+    {
+        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
+                js0.Null, js0.Default ]);
+
+        if (this.nativeApp === null)
+            throw new Error('Platform not set.');
+
+        if (!this._initialized)
+            throw new Error(`'abNative' has not been initialized.`);
+
+        if (!this.getActionSet(actionsSetName).hasNative(actionName)) {
+            throw new Error(`Action '${actionName}' does not exist in Actions Set '${actionsSetName}'.`);
+        }
+        let actionInfo = this.getActionSet(actionsSetName).getNativeInfo(actionName);
+
+        let actionId = ++this._actionId_Last;
+        this._onResultInfos[actionId] = {
+            actionInfo: actionInfo,
+            callbackFn: callbackFn,
+        };
+
+        this.nativeApp.callNative(actionId, actionsSetName, actionInfo, args);
+    }
 
 }
 export default abNative = new abNative_Class();

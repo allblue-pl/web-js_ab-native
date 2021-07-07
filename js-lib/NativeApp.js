@@ -36,7 +36,24 @@ export default class NativeApp
             throw new Error(`Wrong action '${actionInfo.name}' args.`);
         }
 
-        let result = actionInfo.fn(args);
+        let fnResult = actionInfo.fn(args);
+        if (js0.type(fnResult, Promise)) {
+            fnResult
+                .then((result) => {
+                    this._callWeb_ParseResult(actionId, result);
+                })
+                .catch((err) => {
+                    throw err;
+                });
+        } else {
+            this._callWeb_ParseResult(actionId, fnResult);
+        }
+
+        this.__onWebResult(actionId, result);
+    }
+    
+    _callWeb_ParseResult(actionId, actionInfo, result)
+    {
         if (actionInfo.resultArgs === null) {
             if (!js0.type(result, js0.Null))
                 throw new Error(`Wrong action '${actionInfo.name}' result. Expected: null.`);
@@ -46,15 +63,8 @@ export default class NativeApp
                     actionInfo.resultArgs);
         }
 
-        // if (js0.type(fn, Promise)) {
-        //     fn.then(() => {
-        //         this.__onWebResult(actionId, result);
-        //     });
-        // } else {
         this.__onWebResult(actionId, result);
-        // }
     }
-    
 
     _getNextActionId()
     {

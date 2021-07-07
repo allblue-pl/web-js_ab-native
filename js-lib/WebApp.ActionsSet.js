@@ -34,6 +34,11 @@ export default class ActionsSet
         this.webApp.callWeb(actionsSetName, actionName, args, callbackFn);
     }
 
+    hasNative(actionName)
+    {
+        return actionName in this._actions_Native;
+    }
+
     getNativeInfo(actionName)
     {
         if (!(actionName in this._actions_Native))

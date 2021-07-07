@@ -35,6 +35,8 @@ export default class WebApp
     callNative(actionId, actionsSetName, actionName, args, callbackFn)
     {
         let actionsSet = this.getActionsSet(actionsSetName);
+        if (!actionsSet.hasNative(actionName))
+            throw new Error(`Action '${actionName}' does not exist in Actions Set '${actionsSetName}'.`);
         let actionInfo = actionsSet.getNativeInfo(actionName);
 
         let result = actionInfo.fn(args);
