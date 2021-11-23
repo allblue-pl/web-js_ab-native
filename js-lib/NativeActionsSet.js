@@ -17,22 +17,9 @@ export default class NativeActionsSet
         this.actionsSet = actionsSet;
     }
 
-    callNative(actionName, actionArgs = {}, callbackFn = null)
+    async callNative_Async(actionName, actionArgs = {})
     {
-        abNative.callNative(this.name, actionName, actionArgs, callbackFn);
-    }
-
-    callNative_Async(actionName, actionArgs = {})
-    {
-        return new Promise((resolve, reject) => {
-            try {
-                this.callNative(actionName, actionArgs, (result) => {
-                    resolve(result);
-                });
-            } catch (e) {
-                reject(e);
-            }
-        });
+        return await abNative.callNative_Async(this.name, actionName, actionArgs);
     }
 
 }
