@@ -54,6 +54,8 @@ export default class NativeApp
     
     _callWeb_ParseResult(actionId, actionInfo, result)
     {
+        console.log(actionInfo);
+
         if (actionInfo.resultArgs === null) {
             if (!js0.type(result, js0.Null))
                 throw new Error(`Wrong action '${actionInfo.name}' result. Expected: null.`);
