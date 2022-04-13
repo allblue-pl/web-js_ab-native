@@ -40,22 +40,20 @@ export default class NativeApp
         if (js0.type(fnResult, Promise)) {
             fnResult
                 .then((result) => {
-                    this._callWeb_ParseResult(actionId, result);
+                    this._callWeb_ParseResult(actionId, actionInfo, result);
                 })
                 .catch((err) => {
                     throw err;
                 });
         } else {
-            this._callWeb_ParseResult(actionId, fnResult);
+            this._callWeb_ParseResult(actionId, actionInfo, fnResult);
         }
 
-        this.__onWebResult(actionId, result);
+        // this.__onWebResult(actionId, result);
     }
     
     _callWeb_ParseResult(actionId, actionInfo, result)
     {
-        console.log(actionInfo);
-
         if (actionInfo.resultArgs === null) {
             if (!js0.type(result, js0.Null))
                 throw new Error(`Wrong action '${actionInfo.name}' result. Expected: null.`);

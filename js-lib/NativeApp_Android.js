@@ -28,7 +28,7 @@ export default class NativeApp_Android extends NativeApp
     {
         js0.args(arguments, 'int', [ js0.RawObject, js0.Null ]);
 
-        abNative_Android.onWebResult(actionId, result);
+        abNative_Android.onWebResult(actionId, JSON.stringify(result));
     }
     /* / NativeApp */
 
