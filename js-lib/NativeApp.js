@@ -12,28 +12,43 @@ export default class NativeApp
         
     }
 
-    callNative(actionId, actionsSetName, actionInfo, args)
+    callNative(actionId, actionsSetName, actionInfo, args = null)
     {
         js0.args(arguments, 'int', 'string', js0.RawObject, js0.RawObject, 
                 [ 'function', js0.Null, js0.Default ]);
 
         let errors = [];
-        if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
-            console.error(errors);
-            throw new Error(`Wrong action '${actionInfo.name}' args.`);
+        if (actionInfo.actionArgs === null) {
+            if (args !== null) {
+                console.error('Action takes no arguments.');
+                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+            }
+        } else {
+            if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
+                console.error(errors);
+                throw new Error(`Wrong action '${actionInfo.name}' args.`);
+            }
         }
         
         this.__callNative(actionId, actionsSetName, actionInfo.name, args);
     }
 
-    callWeb(actionId, actionsSetsName, actionInfo, args)
+    callWeb(actionId, actionsSetsName, actionInfo, args = null)
     {
-        js0.args(arguments, 'int', 'string', js0.RawObject, js0.RawObject);
+        js0.args(arguments, 'int', 'string', js0.RawObject, [ js0.RawObject,
+                js0.Null ]);
 
         let errors = [];
-        if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
-            console.error(errors);
-            throw new Error(`Wrong action '${actionInfo.name}' args.`);
+        if (actionInfo.actionArgs === null) {
+            if (args !== null) {
+                console.error('Action takes no arguments.');
+                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+            }
+        } else {
+            if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
+                console.error(errors);
+                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+            }
         }
 
         let fnResult = actionInfo.fn(args);
@@ -51,13 +66,21 @@ export default class NativeApp
 
         // this.__onWebResult(actionId, result);
     }
+
+    init()
+    {
+        this.__init();
+    }
+
     
     _callWeb_ParseResult(actionId, actionInfo, result)
     {
+        let errors = [];
         if (actionInfo.resultArgs === null) {
-            if (!js0.type(result, js0.Null))
-                throw new Error(`Wrong action '${actionInfo.name}' result. Expected: null.`);
-        } else if (!js0.type(result, js0.Preset(actionInfo.resultArgs))) {
+            if (!js0.type(result, 'undefined'))
+                throw new Error(`Wrong action '${actionInfo.name}' result. Expected: none.`);
+            result = null;
+        } else if (!js0.type(result, js0.Preset(actionInfo.resultArgs), errors)) {
             console.error(errors);
             throw new Error(`Wrong action '${actionInfo.name}' result. Expected: ` + 
                     actionInfo.resultArgs);
@@ -74,7 +97,13 @@ export default class NativeApp
 
     __callNative(actionsSetName, actionName, args, callbackFn = null)
     {
-        js0.args(arguments, 'string', 'string', js0.RawObject, 'function');
+        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Null ], 
+                'function');
+        js0.virtual(this);
+    }
+
+    __init()
+    {
         js0.virtual(this);
     }
 

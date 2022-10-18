@@ -19,7 +19,8 @@ export default class ActionsSetDef
 
     addNative(actionName, actionArgs, resultArgs)
     {
-        js0.args(arguments, 'string', js0.RawObject, js0.RawObject);
+        js0.args(arguments, 'string', [ js0.RawObject, js0.Null ], 
+                [ js0.RawObject, js0.Null ]);
 
         this._actions_Native[actionName] = {
             name: actionName,
@@ -32,7 +33,8 @@ export default class ActionsSetDef
 
     addWeb(actionName, actionArgs, resultArgs, fn)
     {
-        js0.args(arguments, 'string', js0.RawObject, js0.RawObject, 'function');
+        js0.args(arguments, 'string', [ js0.RawObject, js0.Null ], 
+                [ js0.RawObject, js0.Null ], 'function');
 
         this._actions_Web[actionName] = {
             name: actionName,

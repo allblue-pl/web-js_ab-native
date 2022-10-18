@@ -35,6 +35,9 @@ class abNative_Class
 
         js0.args(arguments, 'string', require('./ActionsSetDef'));
 
+        if (this._initialized)
+            throw new Error('Cannot add action set after initialization.');
+
         let nativeActionsSet = new NativeActionsSet(actionsSetName, actionsSet);
 
         this._actionsSets[actionsSetName] = actionsSet;
@@ -49,10 +52,13 @@ class abNative_Class
     //     return new NativeActionsSet(name);
     // }
 
-    callNative_Async(actionsSetName, actionName, args = {}, callbackFn = null)
+    callNative_Async(actionsSetName, actionName, args = null, callbackFn = null)
     {
         js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
                 js0.Null, js0.Default ]);
+
+        if (!this._initialized)
+            throw new Error(`'abNative' has not been initialized.`);
 
         return new Promise((resolve, reject) => {
             try {
@@ -110,7 +116,7 @@ class abNative_Class
             this.nativeApp = new (require('./NativeApp_IOS'))();
 
         this._initialized = true;
-        // this.nativeApp.init();
+        this.nativeApp.init();
     }
 
     onNativeResult(actionId, result)
@@ -145,14 +151,14 @@ class abNative_Class
             parseResultFn(result);
     }
 
-    setPlatform(platform)
-    {
-        js0.args(arguments, js0.Enum([ 'web', 'android', 'ios' ]));
+    // setPlatform(platform)
+    // {
+    //     js0.args(arguments, js0.Enum([ 'web', 'android', 'ios' ]));
 
-        console.log('Platform set: ' + platform);
+    //     console.log('Platform set: ' + platform);
 
-        this.init(platform);
-    }
+    //     this.init(platform);
+    // }
 
 
     _callNative(actionsSetName, actionName, args = {}, callbackFn = null)
