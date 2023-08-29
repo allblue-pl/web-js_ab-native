@@ -21,7 +21,7 @@ export default class NativeApp
         if (actionInfo.actionArgs === null) {
             if (args !== null) {
                 console.error('Action takes no arguments.');
-                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+                throw new Error(`Wrong action '${actionsSetName}:${actionInfo.name}' args.`);
             }
         } else {
             if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {

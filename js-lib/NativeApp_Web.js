@@ -22,6 +22,11 @@ export default class NativeApp_Web extends NativeApp
         abNative_WebApp.callNative(actionId, actionsSetName, actionName, args);
     }
 
+    __init()
+    {
+        
+    }
+
     // __onWebResult(actionId, result)
     // {
     //     abNative_WebApp.onWebResult(actionId, result);

@@ -30,6 +30,9 @@ export default class NativeApp_Android extends NativeApp
 
     __init()
     {
+        if (typeof abNative_Android === 'undefined')
+            throw new Error('Native module not initialized.');
+
         abNative_Android.webViewInitialized();
     }
 
