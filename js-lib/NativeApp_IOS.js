@@ -29,6 +29,20 @@ export default class NativeApp_IOS extends NativeApp
         });
     }
 
+    __init()
+    {
+        if (typeof window.webkit === 'undefined')
+            throw new Error('Native module not initialized.');
+        if (typeof window.webkit.messageHandlers === 'undefined')
+            throw new Error('Native module not initialized.');
+        if (typeof window.webkit.messageHandlers.abNative_IOS === 'undefined')
+            throw new Error('Native module not initialized.');
+
+        window.webkit.messageHandlers.abNative_IOS.postMessage({
+            messageType: 'webViewInitialized'
+        });
+    }
+
     __onWebResult(actionId, result)
     {
         js0.args(arguments, 'int', [ js0.RawObject, js0.Null ]);
