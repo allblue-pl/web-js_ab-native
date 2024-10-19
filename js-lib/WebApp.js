@@ -15,16 +15,14 @@ export default class WebApp
     }
 
 
-    constructor()
-    {
+    constructor() {
         this._actionsSets = {};
         this._onResultListeners = {};
 
         this._actionId_Last = 0;
     }
 
-    addActionsSet(actionsSetName, actionsSet)
-    {
+    addActionsSet(actionsSetName, actionsSet) {
         js0.args(arguments, 'string', require('./WebApp.ActionsSet'));
 
         this._actionsSets[actionsSetName] = actionsSet;
@@ -32,8 +30,7 @@ export default class WebApp
         return new NativeActionsSet(actionsSetName, actionsSet);
     }
 
-    callNative(actionId, actionsSetName, actionName, args, callbackFn)
-    {
+    callNative(actionId, actionsSetName, actionName, args, callbackFn) {
         let actionsSet = this.getActionsSet(actionsSetName);
         if (!actionsSet.hasNative(actionName))
             throw new Error(`Action '${actionName}' does not exist in Actions Set '${actionsSetName}'.`);
@@ -43,28 +40,24 @@ export default class WebApp
         abNative.onNativeResult(actionId, result);
     }
 
-    callWeb(actionsSetsName, actionName, args, callbackFn = null)
-    {   
+    callWeb(actionsSetsName, actionName, args, callbackFn = null) {   
         let actionId = ++this._actionId_Last;
         this._onResultListeners[actionId] = callbackFn;
         abNative.callWeb(actionId, actionsSetsName, actionName, args);
     }
 
-    createActionsSet(actionsSetName)
-    {
+    createActionsSet(actionsSetName) {
         return new ActionsSet(this, actionsSetName);
     }
 
-    getActionsSet(actionsSetName)
-    {
+    getActionsSet(actionsSetName) {
         if (!(actionsSetName in this._actionsSets))
             throw new Error(`Actions Set '${actionsSetName}' does not exist.`);
 
         return this._actionsSets[actionsSetName];
     }
 
-    onWebResult(actionId, result)
-    {
+    onWebResult(actionId, result) {
         this._onResultListeners[actionId](result);
         delete this._onResultListeners[actionId];
     }

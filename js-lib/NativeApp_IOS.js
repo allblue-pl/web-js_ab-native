@@ -9,16 +9,15 @@ const
 export default class NativeApp_IOS extends NativeApp
 {
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
 
     /* NativeApp */
-    __callNative(actionId, actionsSetName, actionName, actionArgs)
-    {
-        js0.args(arguments, 'int', 'string', 'string', js0.RawObject);
+    __callNative(actionId, actionsSetName, actionName, actionArgs) {
+        js0.args(arguments, 'int', 'string', 'string', 
+                [ js0.RawObject, js0.Null] );
         
         window.webkit.messageHandlers.abNative_IOS.postMessage({
             messageType: 'callNative',
@@ -29,8 +28,7 @@ export default class NativeApp_IOS extends NativeApp
         });
     }
 
-    __init()
-    {
+    __init() {
         if (typeof window.webkit === 'undefined')
             throw new Error('Native module not initialized.');
         if (typeof window.webkit.messageHandlers === 'undefined')
@@ -43,14 +41,15 @@ export default class NativeApp_IOS extends NativeApp
         });
     }
 
-    __onWebResult(actionId, result)
-    {
-        js0.args(arguments, 'int', [ js0.RawObject, js0.Null ]);
+    __onWebResult(actionId, result, error) {
+        js0.args(arguments, 'int', [ js0.RawObject, js0.Null ], 
+                [ 'string', js0.Null ]);
 
         window.webkit.messageHandlers.abNative_IOS.postMessage({
             messageType: 'onWebResult',
             actionId: actionId,
             result: result,
+            error: error,
         });
     }
     /* / NativeApp */

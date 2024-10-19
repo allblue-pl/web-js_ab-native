@@ -9,16 +9,14 @@ const
 export default class ActionsSetDef
 {
 
-    constructor()
-    {
+    constructor() {
         js0.args(arguments);
 
         this._actions_Native = {};
         this._actions_Web = {};
     }
 
-    addNative(actionName, actionArgs, resultArgs)
-    {
+    addNative(actionName, actionArgs, resultArgs) {
         js0.args(arguments, 'string', [ js0.RawObject, js0.Null ], 
                 [ js0.RawObject, js0.Null ]);
 
@@ -31,8 +29,7 @@ export default class ActionsSetDef
         return this;
     }
 
-    addWeb(actionName, actionArgs, resultArgs, fn)
-    {
+    addWeb(actionName, actionArgs, resultArgs, fn) {
         js0.args(arguments, 'string', [ js0.RawObject, js0.Null ], 
                 [ js0.RawObject, js0.Null ], 'function');
 
@@ -64,16 +61,14 @@ export default class ActionsSetDef
     //     });
     // }
 
-    getNativeInfo(actionName)
-    {
+    getNativeInfo(actionName) {
         if (!(actionName in this._actions_Native))
             throw new Error(`Action '${actionName}' does not exist.`);
 
         return this._actions_Native[actionName];
     }
 
-    getWebInfo(actionName)
-    {
+    getWebInfo(actionName) {
         if (!(actionName in this._actions_Web))
             throw new Error(`Action '${actionName}' does not exist.`);
 

@@ -9,21 +9,18 @@ const
 export default class NativeApp_Web extends NativeApp 
 {
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
     
     /* NativeApp */
-    __callNative(actionId, actionsSetName, actionName, args)
-    {
+    __callNative(actionId, actionsSetName, actionName, args) {
         js0.args(arguments, 'int', 'string', 'string', js0.RawObject);
         abNative_WebApp.callNative(actionId, actionsSetName, actionName, args);
     }
 
-    __init()
-    {
+    __init() {
         
     }
 

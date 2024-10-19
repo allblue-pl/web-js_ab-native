@@ -16,19 +16,17 @@ class abNative_Class
     }
 
 
-    constructor()
-    {
+    constructor() {
         this.nativeApp = null;
 
         this._actionsSets = {};
         this._initialized = false;
 
-        this._actionId_Last = 0;
+        this._actionId_Next = 0;
         this._onResultInfos = {};
     }
 
-    addActionsSet(actionsSetName, actionsSet)
-    {
+    addActionsSet(actionsSetName, actionsSet) {
         const 
             NativeActionsSet = require('./NativeActionsSet')
         ;
@@ -52,28 +50,28 @@ class abNative_Class
     //     return new NativeActionsSet(name);
     // }
 
-    callNative_Async(actionsSetName, actionName, args = null, callbackFn = null)
-    {
-        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
-                js0.Null, js0.Default ]);
+    callNative_Async(actionsSetName, actionName, args = null) {
+        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], 
+                [ 'function', js0.Null, js0.Default ]);
 
         if (!this._initialized)
             throw new Error(`'abNative' has not been initialized.`);
-
         return new Promise((resolve, reject) => {
             try {
                 this._callNative(actionsSetName, actionName, args, (result) => {
                     resolve(result);
+                }, (err) => {
+                    reject(err);
                 });
-            } catch (e) {
-                reject(e);
+            } catch (err) {
+                reject(err);
             }
         });
     }
 
-    callWeb(actionId, actionsSetName, actionName, args)
-    {
-        js0.args(arguments, 'int', 'string', 'string', js0.RawObject);
+    callWeb(actionId, actionsSetName, actionName, actionArgs) {
+        js0.args(arguments, 'int', 'string', 'string', 
+                [ js0.RawObject, js0.Null ]);
 
         if (this.nativeApp === null)
             throw new Error('Platform not set.');
@@ -82,30 +80,27 @@ class abNative_Class
             throw new Error(`'abNative' has not been initialized.`);
 
         this.nativeApp.callWeb(actionId, actionsSetName, 
-                this.getActionSet(actionsSetName).getWebInfo(actionName), args);
+                this.getActionSet(actionsSetName).getWebInfo(actionName), 
+                actionArgs);
     }
 
-    errorNative(message)
-    {
+    errorNative(message) {
         console.error('Native error:', message);
     }
 
-    getActionInfo(actionsSetName, actionName)
-    {
+    getActionInfo(actionsSetName, actionName) {
         if (!(actionName in nativeActions.actions_Web))
             throw new Error(`Action '${actionName}' does not exist.`);
     }
 
-    getActionSet(actionsSetName)
-    {
+    getActionSet(actionsSetName) {
         if (!(actionsSetName in this._actionsSets))
             throw new Error(`Actions Set '${actionsSetName}' does not exist.`);
 
         return this._actionsSets[actionsSetName];
     }
 
-    init(platform)
-    {
+    init(platform) {
         js0.args(arguments, js0.Enum([ 'web', 'android', 'ios' ]));
 
         if (platform === 'web')
@@ -119,36 +114,59 @@ class abNative_Class
         this.nativeApp.init();
     }
 
-    onNativeResult(actionId, result)
-    {
+    onNativeResult(actionId, result, error) {
+        if (!(actionId in this._onResultInfos))
+            throw new Error(`Action '${actionId}' does not exist.`);
+
         let actionInfo = this._onResultInfos[actionId].actionInfo;
 
-        let parseResultFn = (result) => {
+        if (error !== null)
+            this._onResultInfos[actionId].onErrorFn(error);
+        else { 
             if (actionInfo.resultArgs !== null) {
                 let errors = [];
                 if (!js0.type(result, js0.Preset(actionInfo.resultArgs), errors)) {
                     console.error('Result:', result);
                     console.error(errors);
-                    throw new Error(`Wrong action '${actionInfo.name}' result.`);
+                    this._onResultInfos[actionId].onErrorFn(
+                            `Wrong action '${actionInfo.name}' result.`);
+                    delete this._onResultInfos[actionId];
+                    return;
                 }
             }
-    
-            if (this._onResultInfos[actionId].callbackFn !== null)
-                this._onResultInfos[actionId].callbackFn(result);
-            delete this._onResultInfos[actionId];
-        };
 
-        if (result instanceof Promise) {
-            result
-                .then((result) => {
-                    parseResultFn(result);
-                })
-                .catch((e) => {
-                    console.error('Cannot parse native result promise:');
-                    console.error(e);
-                });
-        } else 
-            parseResultFn(result);
+            this._onResultInfos[actionId].onResultFn(result);
+        }
+
+        delete this._onResultInfos[actionId];
+
+        // let parseResultFn = (result) => {
+        //     console.log(actionInfo, result);
+        //     if (actionInfo.resultArgs !== null) {
+        //         let errors = [];
+        //         if (!js0.type(result, js0.Preset(actionInfo.resultArgs), errors)) {
+        //             console.error('Result:', result);
+        //             console.error(errors);
+        //             throw new Error(`Wrong action '${actionInfo.name}' result.`);
+        //         }
+        //     }
+    
+        //     if (this._onResultInfos[actionId].callbackFn !== null)
+        //         this._onResultInfos[actionId].callbackFn(result);
+        //     delete this._onResultInfos[actionId];
+        // };
+
+        // if (result instanceof Promise) {
+        //     result
+        //         .then((result) => {
+        //             parseResultFn(result);
+        //         })
+        //         .catch((e) => {
+        //             console.error('Cannot parse native result promise:');
+        //             console.error(e);
+        //         });
+        // } else 
+        //     parseResultFn(result);
     }
 
     // setPlatform(platform)
@@ -161,10 +179,9 @@ class abNative_Class
     // }
 
 
-    _callNative(actionsSetName, actionName, args = {}, callbackFn = null)
-    {
-        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Default ], [ 'function', 
-                js0.Null, js0.Default ]);
+    _callNative(actionsSetName, actionName, actionArgs, onResultFn, onErrorFn) {
+        js0.args(arguments, 'string', 'string', [ js0.RawObject, 
+                js0.Null ], 'function', 'function');
 
         if (this.nativeApp === null)
             throw new Error('Platform not set.');
@@ -175,15 +192,20 @@ class abNative_Class
         if (!this.getActionSet(actionsSetName).hasNative(actionName)) {
             throw new Error(`Action '${actionName}' does not exist in Actions Set '${actionsSetName}'.`);
         }
-        let actionInfo = this.getActionSet(actionsSetName).getNativeInfo(actionName);
+        let actionInfo = this.getActionSet(actionsSetName)
+                .getNativeInfo(actionName);
 
-        let actionId = ++this._actionId_Last;
+        let actionId = this._actionId_Next;
+        this._actionId_Next++;
+
         this._onResultInfos[actionId] = {
             actionInfo: actionInfo,
-            callbackFn: callbackFn,
+            onResultFn: onResultFn,
+            onErrorFn: onErrorFn,
         };
 
-        this.nativeApp.callNative(actionId, actionsSetName, actionInfo, args);
+        this.nativeApp.callNative(actionId, actionsSetName, actionInfo, 
+                actionArgs);
     }
 
 }

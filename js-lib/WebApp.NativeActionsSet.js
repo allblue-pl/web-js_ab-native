@@ -7,23 +7,20 @@ const
 export default class NativeActionsSet
 {
 
-    constructor(actionsSetName, actionsSet)
-    {
+    constructor(actionsSetName, actionsSet) {
         js0.args(arguments, 'string', require('./WebApp.ActionsSet'));
 
         this.name = actionsSetName;
         this.actionsSet = actionsSet;
     }
 
-    callWeb(actionName, args, callbackFn)
-    {
+    callWeb(actionName, args, callbackFn) {
         js0.args(arguments, 'string', js0.RawObject, callbackFn);
 
         this.webApp.callWeb(this.name, actionName, args, callbackFn);
     }
 
-    callWeb_Async(actionName, args)
-    {
+    callWeb_Async(actionName, args) {
         js0.args(arguments, 'string', js0.RawObject);
 
         return new Promise((resolve, reject) => {

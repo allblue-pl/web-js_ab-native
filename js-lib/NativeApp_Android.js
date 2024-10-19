@@ -9,15 +9,13 @@ const
 export default class NativeApp_Android extends NativeApp
 {
 
-    constructor()
-    {
+    constructor() {
         super();
     }
 
 
     /* NativeApp */
-    __callNative(actionId, actionsSetName, actionName, args)
-    {
+    __callNative(actionId, actionsSetName, actionName, args) {
         js0.args(arguments, 'int', 'string', 'string', [ js0.RawObject, 
                 js0.Null ] );
         
@@ -28,23 +26,22 @@ export default class NativeApp_Android extends NativeApp
                 args === null ? null : JSON.stringify(args));
     }
 
-    __init()
-    {
+    __init() {
         if (typeof abNative_Android === 'undefined')
             throw new Error('Native module not initialized.');
 
         abNative_Android.webViewInitialized();
     }
 
-    __onWebResult(actionId, result)
-    {
-        js0.args(arguments, 'int', [ js0.RawObject, js0.Null ]);
+    __onWebResult(actionId, result, error) {
+        js0.args(arguments, 'int', [ js0.RawObject, js0.Null ],
+                [ 'string', js0.Null ]);
 
         if (typeof abNative_Android === 'undefined')
             throw new Error('Native module not initialized.');
 
         abNative_Android.onWebResult(actionId, result === null ? 
-                null : JSON.stringify(result));
+                null : JSON.stringify(result), error);
     }
     /* / NativeApp */
 

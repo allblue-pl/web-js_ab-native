@@ -7,15 +7,13 @@ const
 export default class NativeApp
 {
 
-    constructor()
-    {
+    constructor() {
         
     }
 
-    callNative(actionId, actionsSetName, actionInfo, args = null)
-    {
-        js0.args(arguments, 'int', 'string', js0.RawObject, js0.RawObject, 
-                [ 'function', js0.Null, js0.Default ]);
+    callNative(actionId, actionsSetName, actionInfo, args = null) {
+        js0.args(arguments, 'int', 'string', js0.RawObject, [ js0.RawObject, 
+                js0.Null, js0.Default ]);
 
         let errors = [];
         if (actionInfo.actionArgs === null) {
@@ -24,91 +22,104 @@ export default class NativeApp
                 throw new Error(`Wrong action '${actionsSetName}:${actionInfo.name}' args.`);
             }
         } else {
+            if (args === null) {
+                console.error('Action takes arguments, none given.');
+                throw new Error(`Wrong action '${actionsSetName}:${actionInfo.name}' args.`);
+            }
+
             if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
                 console.error(errors);
-                throw new Error(`Wrong action '${actionInfo.name}' args.`);
+                throw new Error(`Wrong action '${actionsSetName}:${actionInfo.name}' args.`);
             }
         }
         
         this.__callNative(actionId, actionsSetName, actionInfo.name, args);
     }
 
-    callWeb(actionId, actionsSetsName, actionInfo, args = null)
-    {
+    callWeb(actionId, actionsSetName, actionInfo, actionArgs = null) {
         js0.args(arguments, 'int', 'string', js0.RawObject, [ js0.RawObject,
                 js0.Null ]);
 
-        let errors = [];
         if (actionInfo.actionArgs === null) {
-            if (args !== null) {
-                console.error('Action takes no arguments.');
-                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+            if (actionArgs !== null) {
+                let errorMessage = `Wrong action '${actionsSetName}:${actionInfo.name}' args:` +
+                        ' Action takes no arguments some given.';
+                console.error(errorMessage);
+                this.__onWebResult(actionId, null, errorMessage);
             }
         } else {
-            if (!js0.type(args, js0.Preset(actionInfo.actionArgs), errors)) {
-                console.error(errors);
-                throw new Error(`Wrong action '${actionsSetsName}:${actionInfo.name}' args.`);
+            let errors = [];
+            if (!js0.type(actionArgs, js0.Preset(actionInfo.actionArgs), errors)) {
+                let errorMessage = `Wrong action '${actionsSetName}:${actionInfo.name}'` +
+                        ' args:';
+                console.error(errorMessage, errors);
+                this.__onWebResult(actionId, null, errorMessage +  '\r\n' +
+                        errors.join('\r\n'));
             }
         }
 
-        let fnResult = actionInfo.fn(args);
+        let fnResult = actionInfo.fn(actionArgs);
         if (js0.type(fnResult, Promise)) {
             fnResult
                 .then((result) => {
                     this._callWeb_ParseResult(actionId, actionInfo, result);
                 })
                 .catch((err) => {
-                    throw err;
+                    this.__onWebResult(actionId, null, err.toString());
                 });
         } else {
-            this._callWeb_ParseResult(actionId, actionInfo, fnResult);
+            try {
+                this._callWeb_ParseResult(actionId, actionInfo, fnResult);
+            } catch (err) {
+                console.error(err);
+                this.__onWebResult(actionId, null, err.toString());
+            }
         }
 
         // this.__onWebResult(actionId, result);
     }
 
-    init()
-    {
+    init() {
         this.__init();
     }
 
     
-    _callWeb_ParseResult(actionId, actionInfo, result)
-    {
+    _callWeb_ParseResult(actionId, actionInfo, result) {
         let errors = [];
+        console.log("A");
         if (actionInfo.resultArgs === null) {
+            console.log("B");
             if (!js0.type(result, 'undefined'))
                 throw new Error(`Wrong action '${actionInfo.name}' result. Expected: none.`);
+            console.log("C");
             result = null;
         } else if (!js0.type(result, js0.Preset(actionInfo.resultArgs), errors)) {
+            console.log("D");
             console.error(errors);
             throw new Error(`Wrong action '${actionInfo.name}' result. Expected: ` + 
                     actionInfo.resultArgs);
         }
 
-        this.__onWebResult(actionId, result);
+        this.__onWebResult(actionId, result, null);
     }
 
-    _getNextActionId()
-    {
+    _getNextActionId() {
         return ++this.actionId_Last;
     }
 
 
-    __callNative(actionsSetName, actionName, args, callbackFn = null)
-    {
-        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Null ], 
-                'function');
+    __callNative(actionId, actionsSetName, actionName, actionArgs) {
+        js0.args(arguments, 'string', 'string', [ js0.RawObject, js0.Null ]);
         js0.virtual(this);
     }
 
-    __init()
-    {
+    __init() {
         js0.virtual(this);
     }
 
-    __onWebResult()
-    {
+    __onWebResult(actionId, result, error) {
+        js0.args(arguments, 'int', [ js0.RawObject, js0.Null ], 
+                [ 'string', js0.Null ]);
         js0.virtual(this);
     }
 

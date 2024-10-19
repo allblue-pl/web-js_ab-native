@@ -9,8 +9,7 @@ const
 export default class ActionsSet
 {
 
-    constructor(webApp)
-    {
+    constructor(webApp) {
         js0.args(arguments, require('./WebApp'));
 
         this.webApp = webApp;
@@ -18,8 +17,7 @@ export default class ActionsSet
         this._actions_Native = {};
     }
 
-    addNative(actionName, fn)
-    {
+    addNative(actionName, fn) {
         js0.args(arguments, 'string', 'function');
 
         this._actions_Native[actionName] = {
@@ -27,20 +25,17 @@ export default class ActionsSet
         };
     }
 
-    callWeb(actionsSetName, actionName, args, callbackFn)
-    {
+    callWeb(actionsSetName, actionName, args, callbackFn) {
         js0.args(arguments, 'string', js0.RawObject, callbackFn);
 
         this.webApp.callWeb(actionsSetName, actionName, args, callbackFn);
     }
 
-    hasNative(actionName)
-    {
+    hasNative(actionName) {
         return actionName in this._actions_Native;
     }
 
-    getNativeInfo(actionName)
-    {
+    getNativeInfo(actionName) {
         if (!(actionName in this._actions_Native))
             abNative.errorNative(`Action '${actionName}' does not exist.`);
 
