@@ -1,7 +1,9 @@
 'use strict';
 
 const
-    js0 = require('js0')
+    js0 = require('js0'),
+
+    abNative = require('.')
 ;
 
 export default class NativeApp
@@ -36,9 +38,19 @@ export default class NativeApp
         this.__callNative(actionId, actionsSetName, actionInfo.name, args);
     }
 
-    callWeb(actionId, actionsSetName, actionInfo, actionArgs = null) {
-        js0.args(arguments, 'int', 'string', js0.RawObject, [ js0.RawObject,
+    callWeb(actionId, actionsSetName, actionName, actionArgs = null) {
+        js0.args(arguments, 'int', 'string', 'string', [ js0.RawObject,
                 js0.Null ]);
+
+        let actionInfo = null;
+        try {
+            actionInfo = abNative.getActionsSet(actionsSetName)
+                    .getWebInfo(actionName);
+        } catch (err) {
+            console.error(err);
+            this.__onWebResult(actionId, null, err.toString());
+            return;
+        }
 
         if (actionInfo.actionArgs === null) {
             if (actionArgs !== null) {
@@ -46,6 +58,7 @@ export default class NativeApp
                         ' Action takes no arguments some given.';
                 console.error(errorMessage);
                 this.__onWebResult(actionId, null, errorMessage);
+                return;
             }
         } else {
             let errors = [];
@@ -55,6 +68,7 @@ export default class NativeApp
                 console.error(errorMessage, errors);
                 this.__onWebResult(actionId, null, errorMessage +  '\r\n' +
                         errors.join('\r\n'));
+                return;
             }
         }
 
@@ -74,6 +88,7 @@ export default class NativeApp
             } catch (err) {
                 console.error(err);
                 this.__onWebResult(actionId, null, err.toString());
+                return;
             }
         }
 
@@ -86,11 +101,9 @@ export default class NativeApp
 
     
     _callWeb_ParseResult(actionId, actionInfo, result) {
-        console.log('Result', actionInfo, result);
-        
         let errors = [];
         if (actionInfo.resultArgs === null) {
-            if (!js0.type(result, 'undefined'))
+            if (!js0.type(result, [ js0.Null, 'undefined' ]))
                 throw new Error(`Wrong action '${actionInfo.name}' result. Expected: none.`);
             result = null;
         } else if (!js0.type(result, js0.Preset(actionInfo.resultArgs), errors)) {

@@ -40,6 +40,8 @@ export default class NativeApp_Android extends NativeApp
         if (typeof abNative_Android === 'undefined')
             throw new Error('Native module not initialized.');
 
+        console.log('Calling on web result', actionId, new Error());
+
         abNative_Android.onWebResult(actionId, result === null ? 
                 null : JSON.stringify(result), error);
     }

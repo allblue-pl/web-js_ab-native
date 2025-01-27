@@ -79,8 +79,7 @@ class abNative_Class
         if (!this._initialized)
             throw new Error(`'abNative' has not been initialized.`);
 
-        this.nativeApp.callWeb(actionId, actionsSetName, 
-                this.getActionSet(actionsSetName).getWebInfo(actionName), 
+        this.nativeApp.callWeb(actionId, actionsSetName, actionName, 
                 actionArgs);
     }
 
@@ -88,12 +87,12 @@ class abNative_Class
         console.error('Native error:', message);
     }
 
-    getActionInfo(actionsSetName, actionName) {
-        if (!(actionName in nativeActions.actions_Web))
-            throw new Error(`Action '${actionName}' does not exist.`);
-    }
+    // getActionInfo(actionsSetName, actionName) {
+    //     if (!(actionName in nativeActions.actions_Web))
+    //         throw new Error(`Action '${actionsSetName}:${actionName}' does not exist.`);
+    // }
 
-    getActionSet(actionsSetName) {
+    getActionsSet(actionsSetName) {
         if (!(actionsSetName in this._actionsSets))
             throw new Error(`Actions Set '${actionsSetName}' does not exist.`);
 
@@ -103,6 +102,10 @@ class abNative_Class
     init(platform) {
         js0.args(arguments, js0.Enum([ 'web', 'android', 'ios' ]));
 
+        if (this._initialized)
+            throw new Error(`'abNative' was already initialized.`);
+        this._initialized = true;
+
         if (platform === 'web')
             this.nativeApp = new (require('./NativeApp_Web'))();
         else if (platform === 'android')
@@ -110,7 +113,6 @@ class abNative_Class
         else if (platform === 'ios')
             this.nativeApp = new (require('./NativeApp_IOS'))();
 
-        this._initialized = true;
         this.nativeApp.init();
     }
 
@@ -189,10 +191,10 @@ class abNative_Class
         if (!this._initialized)
             throw new Error(`'abNative' has not been initialized.`);
 
-        if (!this.getActionSet(actionsSetName).hasNative(actionName)) {
+        if (!this.getActionsSet(actionsSetName).hasNative(actionName)) {
             throw new Error(`Action '${actionName}' does not exist in Actions Set '${actionsSetName}'.`);
         }
-        let actionInfo = this.getActionSet(actionsSetName)
+        let actionInfo = this.getActionsSet(actionsSetName)
                 .getNativeInfo(actionName);
 
         let actionId = this._actionId_Next;
